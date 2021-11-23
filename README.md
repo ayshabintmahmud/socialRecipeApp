@@ -1,7 +1,7 @@
 # socialRecipeApp
 A social recipe app exploring the power of flutter Structure, navigation, displaying information and  Positioning widgets.
 
-![First card]<img src="https://user-images.githubusercontent.com/40881194/143106143-d0e4f58d-6a4b-47d5-9eb7-e182478db601.png" width="400" height="790">
+<img src="https://user-images.githubusercontent.com/40881194/143106143-d0e4f58d-6a4b-47d5-9eb7-e182478db601.png" width="400" height="790">
 
 ![Simulator Screen Shot - iPhone 13 - 2021-11-23 at 16 18 02](https://user-images.githubusercontent.com/40881194/143106221-314e1748-0bca-40d6-8f78-4e1ee32d3df4.png)
 
