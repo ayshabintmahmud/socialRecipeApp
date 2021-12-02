@@ -42,14 +42,18 @@ class Card3 extends StatelessWidget {
             image: AssetImage(recipe.backgroundImage),
             fit: BoxFit.cover,
           ),
-          borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+          borderRadius: const BorderRadius.all(
+            Radius.circular(10.0),
+          ),
         ),
         child: Stack(
           children: [
             Container(
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.6),
-                borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(10.0),
+                ),
               ),
             ),
             Container(
@@ -75,6 +79,7 @@ class Card3 extends StatelessWidget {
               child: Wrap(
                 alignment: WrapAlignment.start,
                 spacing: 12,
+                runSpacing: 12,
                 children: createTagChips(),
               ),
             ),
