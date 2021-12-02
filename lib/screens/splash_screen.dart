@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../models/models.dart';
 
 class SplashScreen extends StatefulWidget {
-  //SplashScreen MaterialPage Helper
   static MaterialPage page() {
     return MaterialPage(
       name: FooderlichPages.splashPath,
@@ -22,7 +22,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    //Initialize App
     Provider.of<AppStateManager>(context, listen: false).initializeApp();
   }
 
@@ -37,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
               height: 200,
               image: AssetImage('assets/fooderlich_assets/rw_logo.png'),
             ),
-            const Text('Initializing...'),
+            const Text('Initializing...')
           ],
         ),
       ),

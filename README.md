@@ -1,10 +1,16 @@
-# socialRecipeApp
-A social recipe app exploring the power of flutter Structure, navigation, displaying information and  Positioning widgets.
+# starter
 
-<img src="https://user-images.githubusercontent.com/40881194/143106143-d0e4f58d-6a4b-47d5-9eb7-e182478db601.png" width="400" height="790">
-<img src="https://user-images.githubusercontent.com/40881194/143106221-314e1748-0bca-40d6-8f78-4e1ee32d3df4.png" width="400" height="790">
-<img src="https://user-images.githubusercontent.com/40881194/143106441-2d8a9fa5-bb61-47b3-afb0-557ee1952237.png" width="400" height="790">
+A new Flutter project.
 
-https://user-images.githubusercontent.com/40881194/143133281-002d5ba6-abd0-43a0-9369-69abe5848ce4.mov
+## Getting Started
 
+This project is a starting point for a Flutter application.
 
+A few resources to get you started if this is your first Flutter project:
+
+- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+
+For help getting started with Flutter, view our
+[online documentation](https://flutter.dev/docs), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.

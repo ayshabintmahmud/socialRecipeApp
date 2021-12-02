@@ -2,19 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../models/models.dart';
 import '../screens/screens.dart';
+import 'app_link.dart';
 
-// extends RouterDelegate
-class AppRouter extends RouterDelegate
+class AppRouter extends RouterDelegate<AppLink>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {
-  // Declares GlobalKey, a unique key across the entire app
   @override
   final GlobalKey<NavigatorState> navigatorKey;
 
-  // Declares AppStateManager
   final AppStateManager appStateManager;
-  //Declares GroceryManager to listen to the user’s state.
   final GroceryManager groceryManager;
-  //Declares ProfileManager to listen to the user profile state.
   final ProfileManager profileManager;
 
   AppRouter({
@@ -22,13 +18,11 @@ class AppRouter extends RouterDelegate
     required this.groceryManager,
     required this.profileManager,
   }) : navigatorKey = GlobalKey<NavigatorState>() {
-    //Add Listeners
     appStateManager.addListener(notifyListeners);
     groceryManager.addListener(notifyListeners);
     profileManager.addListener(notifyListeners);
   }
 
-  // Dispose listeners
   @override
   void dispose() {
     appStateManager.removeListener(notifyListeners);
@@ -37,106 +31,135 @@ class AppRouter extends RouterDelegate
     super.dispose();
   }
 
-  // configures the navigator and pages.
   @override
   Widget build(BuildContext context) {
-    // Configures a Navigator
     return Navigator(
-      // is required to retrieve the current navigator.
       key: navigatorKey,
       onPopPage: _handlePopPage,
-      // Declares pages
       pages: [
-        //SplashScreen
-        if (!appStateManager.isInitialized) SplashScreen.page(),
-        //LoginScreen
-        if (appStateManager.isInitialized && !appStateManager.isLoggedIn)
+        if (!appStateManager.isInitialized) ...[
+          SplashScreen.page(),
+        ] else if (!appStateManager.isLoggedIn) ...[
           LoginScreen.page(),
-
-        //OnboardingScreen
-        if (appStateManager.isLoggedIn && !appStateManager.isOnboardingComplete)
+        ] else if (!appStateManager.isOnboardingComplete) ...[
           OnboardingScreen.page(),
-
-        //Home
-        if (appStateManager.isOnboardingComplete)
+        ] else ...[
           Home.page(appStateManager.getSelectedTab),
-
-        //Create new item
-        // Checks if the user is creating a new grocery item.
-        if (groceryManager.isCreatingNewItem)
-          //If so, shows the Grocery Item screen.
-          GroceryItemScreen.page(
-            onCreate: (item) {
-              // Once the user saves the item, updates the grocery list.
+          if (groceryManager.isCreatingNewItem)
+            GroceryItemScreen.page(onCreate: (item) {
               groceryManager.addItem(item);
-            },
-            onUpdate: (item, index) {
-              // 4 No update
-            },
-          ),
-
-        //Select GroceryItemScreen
-        // Checks to see if a grocery item is selected.
-        if (groceryManager.selectedIndex != -1)
-          // If so, creates the Grocery Item screen page.
-          GroceryItemScreen.page(
-              item: groceryManager.selectedGroceryItem,
-              index: groceryManager.selectedIndex,
-              onUpdate: (item, index) {
-                // it updates the item at the current index.
-                groceryManager.updateItem(item, index);
-              },
-              onCreate: (_) {
-                // 4 No create
-              }),
-
-        //Add Profile Screen
-        if (profileManager.didSelectUser)
-          ProfileScreen.page(profileManager.getUser),
-
-        //Add WebView Screen
-        if (profileManager.didTapOnRaywenderlich) WebViewScreen.page(),
+            }, onUpdate: (item, index) {
+              // No update
+            }),
+          if (groceryManager.selectedIndex != -1)
+            GroceryItemScreen.page(
+                item: groceryManager.selectedGroceryItem,
+                index: groceryManager.selectedIndex,
+                onCreate: (_) {
+                  // No create
+                },
+                onUpdate: (item, index) {
+                  groceryManager.updateItem(item, index);
+                }),
+          if (profileManager.didSelectUser)
+            ProfileScreen.page(profileManager.getUser),
+          if (profileManager.didTapOnRaywenderlich) WebViewScreen.page(),
+        ]
       ],
     );
   }
 
-  bool _handlePopPage(
-      // the current Route
-      Route<dynamic> route,
-      // result is the value that returns when the route completes
-      result) {
-    // Checks if the current route’s pop succeeded.
+  bool _handlePopPage(Route<dynamic> route, result) {
     if (!route.didPop(result)) {
-      // if yes triggers the appropriate state changes.
       return false;
     }
 
-    // 5
-    //Handle Onboarding and splash
     if (route.settings.name == FooderlichPages.onboardingPath) {
       appStateManager.logout();
     }
 
-    //Handle state when user closes grocery item screen
     if (route.settings.name == FooderlichPages.groceryItemDetails) {
       groceryManager.groceryItemTapped(-1);
     }
 
-    //Handle state when user closes profile screen
     if (route.settings.name == FooderlichPages.profilePath) {
       profileManager.tapOnProfile(false);
     }
 
-    //Handle state when user closes WebView screen
     if (route.settings.name == FooderlichPages.raywenderlich) {
       profileManager.tapOnRaywenderlich(false);
     }
 
-    // 6
     return true;
   }
 
-  // Sets setNewRoutePath to null since you aren’t supporting Flutter web apps.
+  //Convert app state to applink
+  AppLink getCurrentPath() {
+    // If the user hasn’t logged in, return the app link with the login path
+    if (!appStateManager.isLoggedIn) {
+      return AppLink(location: AppLink.loginPath);
+      // If the user hasn’t completed onboarding
+    } else if (!appStateManager.isOnboardingComplete) {
+      return AppLink(location: AppLink.onboardingPath);
+      // If the user taps the profile, return the app link with the profile path
+    } else if (profileManager.didSelectUser) {
+      return AppLink(location: AppLink.profilePath);
+      // If the user taps the + button to create a new grocery item,
+    } else if (groceryManager.isCreatingNewItem) {
+      return AppLink(location: AppLink.itemPath);
+      // If the user selected an existing item
+    } else if (groceryManager.selectedGroceryItem != null) {
+      final id = groceryManager.selectedGroceryItem?.id;
+      return AppLink(location: AppLink.itemPath, itemId: id);
+      // If none of the conditions are met,
+    } else {
+      return AppLink(
+          location: AppLink.homePath,
+          currentTab: appStateManager.getSelectedTab);
+    }
+  }
+
+  // Apply configuration helper
   @override
-  Future<void> setNewRoutePath(configuration) async => null;
+  AppLink get currentConfiguration => getCurrentPath();
+
+  //Replace setNewRoutePath
+
+  // call setNewRoutePath() when a new route is pushed.
+  @override
+  Future<void> setNewRoutePath(AppLink newLink) async {
+    // Use a switch to check every location
+    switch (newLink.location) {
+      // If the new location is /profile, show the Profile screen
+      case AppLink.profilePath:
+        profileManager.tapOnProfile(true);
+        break;
+      // Check if the new location starts with /item.
+      case AppLink.itemPath:
+        // If itemId is not null,set the selected grocery item
+        //and show the Grocery Item screen.
+
+        final itemId = newLink.itemId;
+        if (itemId != null) {
+          groceryManager.setSelectedGroceryItem(itemId);
+        } else {
+          // If itemId is null, show an empty Grocery Item screen.
+          groceryManager.createNewItem();
+        }
+        // Hide the Profile screen.
+        profileManager.tapOnProfile(false);
+        break;
+      // If the new location is /home.
+      case AppLink.homePath:
+        // Set the currently selected tab.
+        appStateManager.goToTab(newLink.currentTab ?? 0);
+        // Make sure the Profile screen and Grocery Item screen are hidden.
+        profileManager.tapOnProfile(false);
+        groceryManager.groceryItemTapped(-1);
+        break;
+      // If the location does not exist, do nothing.
+      default:
+        break;
+    }
+  }
 }

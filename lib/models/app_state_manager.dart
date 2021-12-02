@@ -1,7 +1,9 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 
-// Creates constants for each tab the user taps
+import 'app_cache.dart';
+
 class FooderlichTab {
   static const int explore = 0;
   static const int recipes = 1;
@@ -9,72 +11,58 @@ class FooderlichTab {
 }
 
 class AppStateManager extends ChangeNotifier {
-  // checks if the app is initialized
   bool _initialized = false;
-  // lets you check if the user has logged in
   bool _loggedIn = false;
-  // checks if the user completed the onboarding flow
   bool _onboardingComplete = false;
-  // keeps track of which tab the user is on
   int _selectedTab = FooderlichTab.explore;
+  final _appCache = AppCache();
 
-  // These are getter methods for each property.
   bool get isInitialized => _initialized;
   bool get isLoggedIn => _loggedIn;
   bool get isOnboardingComplete => _onboardingComplete;
   int get getSelectedTab => _selectedTab;
 
-  //initializeApp
-  void initializeApp() {
-    // Sets a delayed timer for 2,000 milliseconds before executing the closure
+  void initializeApp() async {
+    _loggedIn = await _appCache.isUserLoggedIn();
+    _onboardingComplete = await _appCache.didCompleteOnboarding();
+
     Timer(
       const Duration(milliseconds: 2000),
       () {
-        // Sets initialized to true
         _initialized = true;
-        // Notifies all listeners
         notifyListeners();
       },
     );
   }
 
-  //login
-  void login(String username, String password) {
-    // Sets loggedIn to true
+  void login(String username, String password) async {
     _loggedIn = true;
-    // Notifies all listeners
+    await _appCache.cacheUser();
     notifyListeners();
   }
 
-  //completeOnboarding
-  void completeOnboarding() {
+  void completeOnboarding() async {
     _onboardingComplete = true;
+    await _appCache.completeOnboarding();
     notifyListeners();
   }
 
-  //goToTab
   void goToTab(index) {
     _selectedTab = index;
     notifyListeners();
   }
 
-  //goToRecipes
   void goToRecipes() {
     _selectedTab = FooderlichTab.recipes;
     notifyListeners();
   }
 
-  //Add logout
-  void logout() {
-    // Resets all app state properties.
-    _loggedIn = false;
-    _onboardingComplete = false;
+  void logout() async {
     _initialized = false;
     _selectedTab = 0;
+    await _appCache.invalidate();
 
-    // Reinitializes the app.
     initializeApp();
-    //Notifies all listeners of state change.
     notifyListeners();
   }
 }

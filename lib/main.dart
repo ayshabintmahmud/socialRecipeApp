@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'fooderlich_theme.dart';
 import 'models/models.dart';
+import 'navigation/app_route_parser.dart';
 import 'navigation/app_router.dart';
 
 void main() {
@@ -20,13 +22,11 @@ class Fooderlich extends StatefulWidget {
 class _FooderlichState extends State<Fooderlich> {
   final _groceryManager = GroceryManager();
   final _profileManager = ProfileManager();
-  //AppStateManager
   final _appStateManager = AppStateManager();
-
-  //Define AppRouter
   late AppRouter _appRouter;
+  //Initialize RouteInformationParser
+  final routeParser = AppRouteParser();
 
-  //Initialize app router
   @override
   void initState() {
     super.initState();
@@ -41,16 +41,13 @@ class _FooderlichState extends State<Fooderlich> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (context) => _groceryManager,
-        ),
-        ChangeNotifierProvider(
-          create: (context) => _profileManager,
-        ),
-        //AppStateManager ChangeNotifierProvider
+        ChangeNotifierProvider(create: (context) => _groceryManager),
         ChangeNotifierProvider(
           create: (context) => _appStateManager,
         ),
+        ChangeNotifierProvider(
+          create: (context) => _profileManager,
+        )
       ],
       child: Consumer<ProfileManager>(
         builder: (context, profileManager, child) {
@@ -60,15 +57,15 @@ class _FooderlichState extends State<Fooderlich> {
           } else {
             theme = FooderlichTheme.light();
           }
-
-          return MaterialApp(
+          // TODO: Replace with Material.router
+          return MaterialApp.router(
             theme: theme,
             title: 'Fooderlich',
-            home: Router(
-              routerDelegate: _appRouter,
-              //Add backButtonDispatcher
-              backButtonDispatcher: RootBackButtonDispatcher(),
-            ),
+            backButtonDispatcher: RootBackButtonDispatcher(),
+            // 1
+            routeInformationParser: routeParser,
+            // 2
+            routerDelegate: _appRouter,
           );
         },
       ),

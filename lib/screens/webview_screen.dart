@@ -1,10 +1,11 @@
 import 'dart:io';
-import '../models/models.dart';
+
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../models/models.dart';
+
 class WebViewScreen extends StatefulWidget {
-  //WebViewScreen MaterialPage Helper
   static MaterialPage page() {
     return MaterialPage(
       name: FooderlichPages.raywenderlich,

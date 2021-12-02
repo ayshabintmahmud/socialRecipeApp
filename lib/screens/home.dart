@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../models/models.dart';
 import 'explore_screen.dart';
 import 'grocery_screen.dart';
 import 'recipes_screen.dart';
 
 class Home extends StatefulWidget {
-  //Home MaterialPage Helper
   static MaterialPage page(int currentTab) {
     return MaterialPage(
       name: FooderlichPages.home,
@@ -37,9 +37,12 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    //Wrap Consumer for AppStateManager
     return Consumer<AppStateManager>(
-      builder: (context, appStateManager, child) {
+      builder: (
+        context,
+        appStateManager,
+        child,
+      ) {
         return Scaffold(
           appBar: AppBar(
             title: Text(
@@ -50,13 +53,15 @@ class _HomeState extends State<Home> {
               profileButton(),
             ],
           ),
-          body: IndexedStack(index: widget.currentTab, children: pages),
+          body: IndexedStack(
+            index: widget.currentTab,
+            children: pages,
+          ),
           bottomNavigationBar: BottomNavigationBar(
             selectedItemColor:
                 Theme.of(context).textSelectionTheme.selectionColor,
             currentIndex: widget.currentTab,
             onTap: (index) {
-              //Update user's selected tab
               Provider.of<AppStateManager>(context, listen: false)
                   .goToTab(index);
             },
@@ -86,12 +91,9 @@ class _HomeState extends State<Home> {
       child: GestureDetector(
         child: const CircleAvatar(
           backgroundColor: Colors.transparent,
-          backgroundImage: AssetImage(
-            'assets/profile_pics/person_stef.jpeg',
-          ),
+          backgroundImage: AssetImage('assets/profile_pics/person_stef.jpeg'),
         ),
         onTap: () {
-          // home -> profile
           Provider.of<ProfileManager>(context, listen: false)
               .tapOnProfile(true);
         },
